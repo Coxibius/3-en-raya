@@ -3,39 +3,574 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3 en Raya</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>3 en Raya - Mejorado</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght @300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #10b981;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --x-color: #f59e0b;
+            --o-color: #06b6d4;
+            --success-color: #22c55e;
+            --danger-color: #ef4444;
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .scoreboard {
+            display: flex;
+            gap: 3rem;
+            background: var(--bg-secondary);
+            padding: 1.5rem 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .score {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .score-label {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .score-x .score-value {
+            color: var(--x-color);
+        }
+
+        .score-o .score-value {
+            color: var(--o-color);
+        }
+
+        .board-container {
+            perspective: 1000px;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 8px;
+            width: 320px;
+            height: 320px;
+            background: var(--bg-secondary);
+            padding: 12px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl);
+            transition: var(--transition);
+        }
+
+        .cell {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cell::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .cell:hover::before {
+            transform: translateX(100%);
+        }
+
+        .cell:not(.filled):hover {
+            background: var(--bg-tertiary);
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .cell.filled {
+            cursor: not-allowed;
+            animation: cellPop 0.3s ease-out;
+        }
+
+        .cell.x {
+            color: var(--x-color);
+        }
+
+        .cell.o {
+            color: var(--o-color);
+        }
+
+        .cell.winning {
+            animation: winningPulse 0.6s ease-in-out infinite alternate;
+        }
+
+        .status {
+            font-size: 1.5rem;
+            font-weight: 600;
+            min-height: 2rem;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .status.x-turn {
+            color: var(--x-color);
+        }
+
+        .status.o-turn {
+            color: var(--o-color);
+        }
+
+        .status.winner {
+            font-size: 2rem;
+            animation: winnerAnnounce 0.5s ease-out;
+        }
+
+        .status.draw {
+            color: var(--text-secondary);
+            animation: drawAnnounce 0.5s ease-out;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 0.8rem 1.8rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .game-over-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .game-over-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .game-over-content {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            transform: scale(0.8);
+            transition: var(--transition);
+        }
+
+        .game-over-overlay.show .game-over-content {
+            transform: scale(1);
+        }
+
+        /* Hover effects for next move preview */
+        .board.x-turn .cell:not(.filled):hover::after {
+            content: 'X';
+            color: var(--x-color);
+            opacity: 0.3;
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        .board.o-turn .cell:not(.filled):hover::after {
+            content: 'O';
+            color: var(--o-color);
+            opacity: 0.3;
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        @keyframes cellPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes winningPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); box-shadow: 0 0 20px currentColor; }
+        }
+
+        @keyframes winnerAnnounce {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes drawAnnounce {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Responsive design */
+        @AppData\Local\BraveSoftware\Brave-Browser\User Data\Default\MediaDeviceSalts-journal (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .board {
+                width: 280px;
+                height: 280px;
+            }
+            
+            .cell {
+                font-size: 2.5rem;
+            }
+            
+            .scoreboard {
+                gap: 2rem;
+                padding: 1rem 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>3 en Raya</h1>
+        <div class="header">
+            <h1 class="title">3 en Raya</h1>
+            <p class="subtitle">El clásico juego de estrategia</p>
+        </div>
+
         <div class="scoreboard">
-            <div class="score">
-                <p>Jugador X</p>
-                <span id="scoreX">0</span>
+            <div class="score score-x">
+                <div class="score-label">Jugador X</div>
+                <div class="score-value" id="scoreX">0</div>
             </div>
-            <div class="score">
-                <p>Jugador O</p>
-                <span id="scoreO">0</span>
+            <div class="score score-o">
+                <div class="score-label">Jugador O</div>
+                <div class="score-value" id="scoreO">0</div>
             </div>
         </div>
-        <div id="board" class="board">
-            <div class="cell" data-cell></div>
-            <div class="cell" data-cell></div>
-            <div class="cell" data-cell></div>
-            <div class="cell" data-cell></div>
-            <div class="cell" data-cell></div>
-            <div class="cell" data-cell></div>
-            <div class="cell" data-cell></div>
-            <div class="cell" data-cell></div>
-            <div class="cell" data-cell></div>
+
+        <div class="board-container">
+            <div class="board" id="board">
+                <div class="cell" data-index="0"></div>
+                <div class="cell" data-index="1"></div>
+                <div class="cell" data-index="2"></div>
+                <div class="cell" data-index="3"></div>
+                <div class="cell" data-index="4"></div>
+                <div class="cell" data-index="5"></div>
+                <div class="cell" data-index="6"></div>
+                <div class="cell" data-index="7"></div>
+                <div class="cell" data-index="8"></div>
+            </div>
         </div>
-        <div id="status" class="status"></div>
-        <button id="resetButton">Reiniciar Juego</button>
+
+        <div class="status" id="status">Turno del Jugador X</div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="resetBtn">Nueva Partida</button>
+            <button class="btn btn-secondary" id="resetScoreBtn">Reiniciar Puntuación</button>
+        </div>
     </div>
-    <script src="script.js"></script>
+
+    <div class="game-over-overlay" id="gameOverOverlay">
+        <div class="game-over-content">
+            <h2 id="gameOverTitle">¡Juego Terminado!</h2>
+            <p id="gameOverMessage"></p>
+            <button class="btn btn-primary" id="playAgainBtn">Jugar Otra Vez</button>
+        </div>
+    </div>
+
+    <script>
+        class TresEnRaya {
+            constructor() {
+                this.board = Array(9).fill(null);
+                this.currentPlayer = 'X';
+                this.gameActive = true;
+                this.scores = { X: 0, O: 0 };
+                this.winningCombinations = [
+                    [0, 1, 2], [3, 4, 5], [6, 7, 8], // Filas
+                    [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columnas
+                    [0, 4, 8], [2, 4, 6] // Diagonales
+                ];
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.updateStatus();
+            }
+
+            initializeElements() {
+                this.boardElement = document.getElementById('board');
+                this.statusElement = document.getElementById('status');
+                this.scoreXElement = document.getElementById('scoreX');
+                this.scoreOElement = document.getElementById('scoreO');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.resetScoreBtn = document.getElementById('resetScoreBtn');
+                this.gameOverOverlay = document.getElementById('gameOverOverlay');
+                this.gameOverTitle = document.getElementById('gameOverTitle');
+                this.gameOverMessage = document.getElementById('gameOverMessage');
+                this.playAgainBtn = document.getElementById('playAgainBtn');
+                this.cells = document.querySelectorAll('.cell');
+            }
+
+            bindEvents() {
+                this.cells.forEach(cell => {
+                    cell.addEventListener('click', (e) => this.handleCellClick(e));
+                });
+
+                this.resetBtn.addEventListener('click', () => this.resetGame());
+                this.resetScoreBtn.addEventListener('click', () => this.resetScores());
+                this.playAgainBtn.addEventListener('click', () => this.closeGameOverAndReset());
+            }
+
+            handleCellClick(event) {
+                const cell = event.target;
+                const index = parseInt(cell.dataset.index);
+
+                if (this.board[index] || !this.gameActive) {
+                    return;
+                }
+
+                this.makeMove(index, cell);
+            }
+
+            makeMove(index, cell) {
+                this.board[index] = this.currentPlayer;
+                cell.textContent = this.currentPlayer;
+                cell.classList.add(this.currentPlayer.toLowerCase(), 'filled');
+
+                const winningCombination = this.checkWinner();
+                if (winningCombination) {
+                    this.handleWin(winningCombination);
+                } else if (this.board.every(cell => cell !== null)) {
+                    this.handleDraw();
+                } else {
+                    this.switchPlayer();
+                }
+            }
+
+            checkWinner() {
+                for (const combination of this.winningCombinations) {
+                    const [a, b, c] = combination;
+                    if (this.board[a] && 
+                        this.board[a] === this.board[b] && 
+                        this.board[a] === this.board[c]) {
+                        return combination;
+                    }
+                }
+                return null;
+            }
+
+            handleWin(winningCombination) {
+                this.gameActive = false;
+                this.scores[this.currentPlayer]++;
+                this.updateScores();
+                this.highlightWinningCells(winningCombination);
+                this.updateStatus(`¡Jugador ${this.currentPlayer} gana!`, 'winner');
+                
+                setTimeout(() => {
+                    this.showGameOverModal(`¡Jugador ${this.currentPlayer} gana!`, 'winner');
+                }, 1500);
+            }
+ handleDraw() {
+                this.gameActive = false;
+                this.updateStatus('¡Empate!', 'draw');
+                
+                setTimeout(() => {
+                    this.showGameOverModal('¡Es un empate!', 'draw');
+                }, 1500);
+            }
+
+            switchPlayer() {
+                this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+                this.updateStatus();
+                this.updateBoardTurn();
+            }
+
+            updateStatus(message = null, className = null) {
+                this.statusElement.className = 'status';
+                
+                if (message) {
+                    this.statusElement.textContent = message;
+                    if (className) {
+                        this.statusElement.classList.add(className);
+                    }
+                } else {
+                    this.statusElement.textContent = `Turno del Jugador ${this.currentPlayer}`;
+                    this.statusElement.classList.add(this.currentPlayer.toLowerCase() + '-turn');
+                }
+            }
+
+            updateBoardTurn() {
+                this.boardElement.classList.remove('x-turn', 'o-turn');
+                this.boardElement.classList.add(this.currentPlayer.toLowerCase() + '-turn');
+            }
+
+            updateScores() {
+                this.scoreXElement.textContent = this.scores.X;
+                this.scoreOElement.textContent = this.scores.O;
+                
+                // Animación de puntuación
+                const scoreElement = this.currentPlayer === 'X' ? this.scoreXElement : this.scoreOElement;
+                scoreElement.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    scoreElement.style.transform = 'scale(1)';
+                }, 300);
+            }
+
+            highlightWinningCells(winningCombination) {
+                winningCombination.forEach(index => {
+                    this.cells[index].classList.add('winning');
+                });
+            }
+
+            showGameOverModal(message, type) {
+                this.gameOverTitle.textContent = type === 'winner' ? '¡Victoria!' : '¡Empate!';
+                this.gameOverMessage.textContent = message;
+                this.gameOverOverlay.classList.add('show');
+            }
+
+            closeGameOverAndReset() {
+                this.gameOverOverlay.classList.remove('show');
+                setTimeout(() => {
+                    this.resetGame();
+                }, 300);
+            }
+
+            resetGame() {
+                this.board = Array(9).fill(null);
+                this.currentPlayer = 'X';
+                this.gameActive = true;
+                
+                this.cells.forEach(cell => {
+                    cell.textContent = '';
+                    cell.className = 'cell';
+                });
+                
+                this.updateStatus();
+                this.updateBoardTurn();
+            }
+
+            resetScores() {
+                this.scores = { X: 0, O: 0 };
+                this.updateScores();
+                this.resetGame();
+            }
+        }
+
+        // Inicializar el juego cuando la página se carga
+        document.addEventListener('DOMContentLoaded', () => {
+            new TresEnRaya();
+        });
+    </script>
 </body>
 </html>
