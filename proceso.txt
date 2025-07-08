@@ -1,0 +1,22 @@
+Se completó la tarea siguiendo estos pasos:
+
+1.  **Creación de la Carpeta del Proyecto:**
+    Se intentó crear la carpeta "juego 3 en raya" en el escritorio del usuario. Aunque el primer comando falló, la creación de los archivos posteriores aseguró que el directorio se estableciera correctamente.
+
+2.  **Creación del Archivo HTML (`index.html`):**
+    Se generó un archivo HTML con la estructura base del juego. Incluye un contenedor principal, el tablero de 3x3, una sección para el marcador de victorias (Jugador X y Jugador O), un área para mostrar el estado del juego (de quién es el turno, quién gana) y un botón para reiniciar la partida. Se enlazaron los archivos CSS y JavaScript.
+
+3.  **Creación del Archivo de Estilos CSS (`styles.css`):**
+    Se diseñó una hoja de estilos para que el juego fuera visualmente atractivo. Se optó por un tema oscuro y moderno, utilizando una paleta de colores contrastante para el fondo, el tablero y las fichas (X y O). Se importó una fuente de Google Fonts ('Poppins') para una mejor tipografía y se añadieron efectos sutiles de `hover` y transiciones para mejorar la experiencia de usuario.
+
+4.  **Creación del Archivo de Lógica JavaScript (`script.js`):**
+    Se implementó el código JavaScript que da vida al juego. La lógica incluye:
+    - Detección de clics en las celdas del tablero.
+    - Alternancia de turnos entre el jugador 'X' y el jugador 'O'.
+    - Verificación de las 8 posibles combinaciones ganadoras después de cada movimiento.
+    - Detección de empates si el tablero se llena sin un ganador.
+    - Actualización del marcador de victorias cada vez que un jugador gana.
+    - Funcionalidad para el botón de reinicio, que limpia el tablero para una nueva partida pero mantiene las puntuaciones.
+
+5.  **Finalización:**
+    Todos los archivos se guardaron en la carpeta "juego 3 en raya" en el escritorio, listos para ser utilizados. Para jugar, simplemente hay que abrir el archivo `index.html` en un navegador web.

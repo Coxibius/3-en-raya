@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+:root {
+    --background-color: #1a1a2e;
+    --board-bg-color: #16213e;
+    --cell-bg-color: #0f3460;
+    --text-color: #e94560;
+    --x-color: #ffc107;
+    --o-color: #00e0ff;
+    --font-family: 'Poppins', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+h1 {
+    font-size: 3rem;
+    font-weight: 600;
+}
+
+.scoreboard {
+    display: flex;
+    gap: 4rem;
+    background-color: var(--board-bg-color);
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.score p {
+    font-size: 1.2rem;
+    font-weight: 400;
+}
+
+.score span {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 10px;
+    background-color: var(--board-bg-color);
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.cell {
+    width: 100px;
+    height: 100px;
+    background-color: var(--cell-bg-color);
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 4rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.cell:not(.x):not(.o):hover {
+    background-color: #1e4a8a;
+    transform: scale(1.05);
+}
+
+.cell.x,
+.cell.o {
+    cursor: not-allowed;
+}
+
+/* Hover effect for next move */
+.board.x .cell:not(.x):not(.o):hover::before {
+    content: 'X';
+    color: var(--x-color);
+    opacity: 0.3;
+}
+
+.board.o .cell:not(.x):not(.o):hover::before {
+    content: 'O';
+    color: var(--o-color);
+    opacity: 0.3;
+}
+
+.cell.x {
+    color: var(--x-color);
+}
+
+.cell.o {
+    color: var(--o-color);
+}
+
+.status {
+    font-size: 1.5rem;
+    min-height: 2rem;
+}
+
+#resetButton {
+    font-family: var(--font-family);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--background-color);
+    background-color: var(--text-color);
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#resetButton:hover {
+    background-color: #f06a81;
+    transform: translateY(-2px);
+}
